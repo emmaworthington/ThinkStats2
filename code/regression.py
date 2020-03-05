@@ -50,7 +50,8 @@ def QuickLeastSquares(xs, ys):
 
 
 def ReadVariables():
-    """Reads Stata dictionary files for NSFG data.
+    """
+    Reads Stata dictionary files for NSFG data.
 
     returns: DataFrame that maps variables names to descriptions
     """
@@ -78,7 +79,7 @@ def JoinFemResp(df):
     return join
 
 
-MESSAGE = """If you get this error, it's probably because 
+MESSAGE = """If you get this error, it's probably because
 you are running Python 3 and the nice people who maintain
 Patsy have not fixed this problem:
 https://github.com/pydata/patsy/issues/34
@@ -88,7 +89,8 @@ Python 2, or skipping this example."""
 
 
 def GoMining(df):
-    """Searches for variables that predict birth weight.
+    """
+    Searches for variables that predict birth weight.
 
     df: DataFrame of pregnancy records
 
@@ -139,11 +141,12 @@ def MiningReport(variables, n=30):
 
 
 def PredictBirthWeight(live):
-    """Predicts birth weight of a baby at 30 weeks.
+    """
+    Predicts birth weight of a baby at 30 weeks.
 
     live: DataFrame of live births
     """
-    live = live[live.prglngth>30]
+    live = live[live.prglngth > 30]
     join = JoinFemResp(live)
 
     t = GoMining(join)
@@ -174,10 +177,12 @@ def SummarizeResults(results):
 
 
 def RunSimpleRegression(live):
-    """Runs a simple regression and compare results to thinkstats2 functions.
+    """
+    Runs a simple regression and compare results to thinkstats2 functions.
 
     live: DataFrame of live births
     """
+
     # run the regression with thinkstats2 functions
     live_dropna = live.dropna(subset=['agepreg', 'totalwgt_lb'])
     ages = live_dropna.agepreg
@@ -233,7 +238,7 @@ def FormatRow(results, columns):
         t.append('%.2g' % results.rsquared)
     except AttributeError:
         t.append('%.2g' % results.prsquared)
-        
+
     return t
 
 
@@ -251,26 +256,30 @@ def RunModels(live):
     rows.append(FormatRow(results, columns))
     print(formula)
     SummarizeResults(results)
+    print()
 
     formula = 'totalwgt_lb ~ agepreg'
     results = smf.ols(formula, data=live).fit()
     rows.append(FormatRow(results, columns))
     print(formula)
     SummarizeResults(results)
-    
+    print()
+
     formula = 'totalwgt_lb ~ isfirst + agepreg'
     results = smf.ols(formula, data=live).fit()
     rows.append(FormatRow(results, columns))
     print(formula)
     SummarizeResults(results)
-    
+    print()
+
     live['agepreg2'] = live.agepreg**2
     formula = 'totalwgt_lb ~ isfirst + agepreg + agepreg2'
     results = smf.ols(formula, data=live).fit()
     rows.append(FormatRow(results, columns))
     print(formula)
     SummarizeResults(results)
-    
+    print()
+
     PrintTabular(rows, header)
 
 
@@ -299,7 +308,7 @@ def LogisticRegressionExample():
 
     beta = [-1.5, 2.8, 1.1]
 
-    log_o = beta[0] + beta[1] * x1 + beta[2] * x2 
+    log_o = beta[0] + beta[1] * x1 + beta[2] * x2
     print(log_o)
 
     o = np.exp(log_o)
@@ -316,7 +325,7 @@ def LogisticRegressionExample():
     results = smf.logit('y ~ x1 + x2', data=df).fit()
     print(results.summary())
 
-    
+
 
 def RunLogisticModels(live):
     """Runs regressions that predict sex.
@@ -333,7 +342,7 @@ def RunLogisticModels(live):
     df['season'] = (((df.datend+1) % 12) / 3).astype(int)
 
     # run the simple model
-    model = smf.logit('boy ~ agepreg', data=df)    
+    model = smf.logit('boy ~ agepreg', data=df)
     results = model.fit()
     print('nobs', results.nobs)
     print(type(results))
@@ -349,7 +358,7 @@ def RunLogisticModels(live):
     # make the scatter plot
     exog = pandas.DataFrame(model.exog, columns=model.exog_names)
     endog = pandas.DataFrame(model.endog, columns=[model.endog_names])
-    
+
     xs = exog['agepreg']
     lo = results.fittedvalues
     o = np.exp(lo)
@@ -377,15 +386,15 @@ def RunLogisticModels(live):
 
 def main(name, data_dir='.'):
     thinkstats2.RandomSeed(17)
-    LogisticRegressionExample()
+    # LogisticRegressionExample()
 
     live, firsts, others = first.MakeFrames()
     live['isfirst'] = (live.birthord == 1)
 
-    RunLogisticModels(live)
+    # RunLogisticModels(live)
 
-    RunSimpleRegression(live)
-    RunModels(live)
+    # RunSimpleRegression(live)
+    # RunModels(live)
 
     PredictBirthWeight(live)
 
